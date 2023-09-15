@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registrasi dan List Pendaftar</title>
+    <!-- Menggunakan Bootstrap untuk styling -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Registrasi dan List Pendaftar</h1>
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#registrasi">Registrasi</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#list">List Pendaftar</a>
+            </li>
+        </ul>
+        
+        <div class="tab-content">
+            <!-- Tab Registrasi -->
+            <div id="registrasi" class="tab-pane fade show active">
+                <h2 class="mt-3">Tab Registrasi</h2>
+                <form id="registrationForm">
+                    <div class="form-group">
+                        <label for="nama">Nama:</label>
+                        <input type="text" class="form-control" id="nama" name="nama" minlength="10" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="umur">Umur:</label>
+                        <input type="number" class="form-control" id="umur" name="umur" min="25" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="uang">Uang Sangu:</label>
+                        <input type="number" class="form-control" id="uang" name="uang" min="100000" max="1000000" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+
+            <!-- Tab List Pendaftar -->
+            <div id="list" class="tab-pane fade">
+                <h2 class="mt-3">Tab List Pendaftar</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Umur</th>
+                            <th>Uang Sangu</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendaftarTable">
+                        <!-- Daftar pendaftar akan muncul di sini -->
+                    </tbody>
+                </table>
+                <p id="resume"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menggunakan Bootstrap dan jQuery untuk mengaktifkan tab dan validasi -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="scripts.js"></script>
+
+    <script>
+        // Objek untuk menangani validasi dan pembaruan data
+class RegistrasiHandler {
+    constructor() {
+        this.pendaftarData = [];
+    }
+
+    tambahPendaftar(nama, umur, uang) {
+        this.pendaftarData.push({ nama, umur, uang });
+    }
+
+    hitungRataRata() {
+        if (this.pendaftarData.length === 0) {
+            return { rataUmur: 0, rataUang: 0 };
+        }
+
+        let totalUmur = 0;
+        let totalUang = 0;
+
+        this.pendaftarData.forEach(pendaftar => {
+            totalUmur += parseInt(pendaftar.umur);
+            totalUang += parseInt(pendaftar.uang);
+        });
+
+        return {
+            rataUmur: totalUmur / this.pendaftarData.length,
+            rataUang: totalUang / this.pendaftarData.length
+        };
+    }
+}
+
+const registrasiHandler = new RegistrasiHandler();
+
+document.getElementById("registrationForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
+    
+    const nama = document.getElementById("nama").value;
+    const umur = parseInt(document.getElementById("umur").value);
+    const uang = parseInt(document.getElementById("uang").value);
+
+    // Validasi data
+    if (nama.length < 10 || umur < 25 || uang < 100000 || uang > 1000000) {
+        alert("Pastikan semua kriteria terpenuhi.");
+        return;
+    }
+
+    // Tambahkan data ke tabel
+    const table = document.getElementById("pendaftarTable");
+    const newRow = table.insertRow(-1);
+    newRow.insertCell(0).textContent = nama;
+    newRow.insertCell(1).textContent = umur;
+    newRow.insertCell(2).textContent = uang;
+
+    // Tambahkan data ke handler
+    registrasiHandler.tambahPendaftar(nama, umur, uang);
+
+    // Hitung rata-rata
+    const { rataUmur, rataUang } = registrasiHandler.hitungRataRata();
+
+    // Tampilkan resume
+    const resume = document.getElementById("resume");
+    resume.textContent = `Rata-rata pendaftar memiliki uang sangu sebesar ${rataUang.toFixed(2)} dengan rata-rata umur ${rataUmur.toFixed(2)}`;
+
+    // Bersihkan form
+    document.getElementById("registrationForm").reset();
+});
+    </script>
+</body>
+</html>
